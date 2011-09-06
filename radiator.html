@@ -7,11 +7,13 @@
  <body bgcolor="black">
    <script src="jquery.js"></script>
    <script src="jquery.sound.js"></script>
+   <script src="jquery.blink.js"></script>
    <script>
-	function Radiator(url, status_id)
+	function Radiator(url, status_id, failure_sound_file)
 	{
 		this.url = url;
 		this.status_id = status_id;
+		this.failure_sound_file = failure_sound_file;
 
 		function color_for(data)
 		{
@@ -32,8 +34,16 @@
 				$(that.status_id).html(data.fullDisplayName);
 				if (color == "red" && color != that.last_status)
 				{
-					$.fn.soundPlay({url: '1.mp3', playerId: 'embed_player', command: 'play'});
+					$.fn.soundPlay({url: that.failure_sound_file, playerId: 'embed_player', command: 'play'});
+					$(that.status_id).blink(
+					{
+						maxBlinks: 10,
+						blinkPeriod: 700,
+						onBlink: function(){}, 
+						onMaxBlinks: function(){}
+					});
 				}
+				
 				that.last_status = color;
 				setTimeout(function(){that.update();}, 5000);
 			}, "jsonp");
@@ -48,7 +58,7 @@
 
 	$(document).ready(function()
 	{
-		r = new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status')
+		r = new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status', '1.mp3')
 		r.init();
 	});
    </script>
