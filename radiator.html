@@ -28,7 +28,6 @@
 			$.getJSON(that.url + 'lastBuild/api/json?jsonp=?',
 			function(data)
 			{
-				build_number = data.number;
 				color = color_for(data)
 				$(that.status_id).css("background-color", color);
 				$(that.status_id).html(data.fullDisplayName);
