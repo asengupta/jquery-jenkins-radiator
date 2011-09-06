@@ -6,33 +6,54 @@
 </head>
  <body bgcolor="black">
    <script src="jquery.js"></script>
+   <script src="jquery.sound.js"></script>
    <script>
-	function color_for(data)
+	function Radiator(url, status_id)
 	{
-		if (data.result == "SUCCESS") return "green";
-		if (data.result == null) return "orange";
-		return "red";
-	}
+		this.url = url;
+		this.status_id = status_id;
 
-	function update()
-	{
-		$.getJSON('http://localhost:8080/job/FooBar%20Project/lastBuild/api/json?jsonp=?',
-		function(data)
+		function color_for(data)
 		{
-			build_number = data.number;
-			$("#project_status").css("background-color", color_for(data));
-			$("#project_status").html(data.fullDisplayName);
-			$("img#trend").attr("src", "http://localhost:8080/job/FooBar%20Project/buildTimeGraph/png?"+new Date().getTime());
-			setTimeout(update, 1000);
-		}, "jsonp");
-	}
+			if (data.result == "SUCCESS") return "green";
+			if (data.result == null) return "orange";
+			return "red";
+		};
+
+		this.update = function()
+		{
+			that = this;
+			$.getJSON(that.url + 'lastBuild/api/json?jsonp=?',
+			function(data)
+			{
+				build_number = data.number;
+				color = color_for(data)
+				$(that.status_id).css("background-color", color);
+				$(that.status_id).html(data.fullDisplayName);
+				if (color == "red" && color != that.last_status)
+				{
+					$.fn.soundPlay({url: '1.mp3', playerId: 'embed_player', command: 'play'});
+				}
+				that.last_status = color;
+				setTimeout(function(){that.update();}, 5000);
+			}, "jsonp");
+		};
+
+		this.init = function()
+		{
+			$(this.status_id).css({"color": "white", "fontSize": 200, "height": 500});
+			this.update();
+		};
+	};
+
 	$(document).ready(function()
 	{
-		$("#project_status").css({"color": "white", "fontSize": 200, "height": 500});
-		update();
+		r = new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status')
+		r.init();
 	});
    </script>
    <div id="project_status" align="center">Loading</div>
-   <img id="trend" width="800" height="400"></img>
+   <span id="sound_file_name" style="display:none"> &nbsp;</span>
  </body>
 </html>
+
