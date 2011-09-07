@@ -9,8 +9,9 @@
    <script src="jquery.sound.js"></script>
    <script src="jquery.blink.js"></script>
    <script>
-	function Radiator(url, status_id, failure_sound_file)
+	function Radiator(url, status_id, failure_sound_file, delay)
 	{
+		this.delay = delay;
 		this.url = url;
 		this.status_id = status_id;
 		this.failure_sound_file = failure_sound_file;
@@ -22,46 +23,68 @@
 			return "red";
 		};
 
+		this.populate = function(data)
+		{
+			color = color_for(data)
+			$(this.status_id).css("background-color", color);
+			$(this.status_id).html(data.fullDisplayName);
+			if (color == "red" && color != this.last_status)
+			{
+				$.fn.soundPlay({url: this.failure_sound_file, playerId: 'embed_player', command: 'play'});
+				$(this.status_id).blink(
+				{
+					maxBlinks: 10,
+					onBlink: function(){}, 
+					blinkPeriod: 700,
+					onMaxBlinks: function(){}
+				});
+			}
+
+			this.last_status = color;
+			console.log("Rescheduling " + this.url);
+			setTimeout(function(radiator)
+					{
+						return function() { radiator.update();};
+					}(this), this.delay);
+		};
+
 		this.update = function()
 		{
-			that = this;
-			$.getJSON(that.url + 'lastBuild/api/json?jsonp=?',
-			function(data)
-			{
-				color = color_for(data)
-				$(that.status_id).css("background-color", color);
-				$(that.status_id).html(data.fullDisplayName);
-				if (color == "red" && color != that.last_status)
-				{
-					$.fn.soundPlay({url: that.failure_sound_file, playerId: 'embed_player', command: 'play'});
-					$(that.status_id).blink(
+			$.ajax({
+			  url: this.url + 'lastBuild/api/json?jsonp=?',
+			  data: null,
+			  success: function(radiator)
 					{
-						maxBlinks: 10,
-						blinkPeriod: 700,
-						onBlink: function(){}, 
-						onMaxBlinks: function(){}
-					});
-				}
-				
-				that.last_status = color;
-				setTimeout(function(){that.update();}, 5000);
-			}, "jsonp");
+						return function(data) { radiator.populate(data);};
+					}(this),
+			  dataType: "jsonp"
+			});
 		};
 
 		this.init = function()
 		{
-			$(this.status_id).css({"color": "white", "fontSize": 200, "height": 500});
-			this.update();
+			that = this;
+			$(this.status_id).css({"color": "white", "fontSize": 160, "height": 400, "width": 1800});
+			that.update();
 		};
 	};
 
 	$(document).ready(function()
 	{
-		r = new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status', '1.mp3')
+		r = new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status1', '1.mp3', 2000);
+		s = new Radiator('http://localhost:8080/job/SecondBazProject/', '#project_status2', '1.mp3', 2000);
+		s.init();
 		r.init();
 	});
    </script>
-   <div id="project_status" align="center">Loading</div>
+   <table>
+	<tr>
+		<td><div id="project_status1" align="center">Loading</div></td>
+	</tr>
+	<tr>
+		<td><div id="project_status2" align="center">Loading</div></td>
+	</tr>
+   </table>
    <span id="sound_file_name" style="display:none"> &nbsp;</span>
  </body>
 </html>
