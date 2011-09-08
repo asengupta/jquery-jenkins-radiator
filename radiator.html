@@ -30,7 +30,6 @@
 			$(this.status_id).html(data.fullDisplayName);
 			if (color == "red" && color != this.last_status)
 			{
-				$.fn.soundPlay({url: this.failure_sound_file, playerId: 'embed_player', command: 'play'});
 				$(this.status_id).blink(
 				{
 					maxBlinks: 10,
@@ -38,6 +37,7 @@
 					blinkPeriod: 700,
 					onMaxBlinks: function(){}
 				});
+				$.fn.soundPlay({url: this.failure_sound_file, playerId: 'embed_player', command: 'play'});
 			}
 
 			this.last_status = color;
@@ -71,10 +71,8 @@
 
 	$(document).ready(function()
 	{
-		r = new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status1', '1.mp3', 2000);
-		s = new Radiator('http://localhost:8080/job/SecondBazProject/', '#project_status2', '1.mp3', 2000);
-		s.init();
-		r.init();
+		new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status1', '1.mp3', 2000).init();
+		new Radiator('http://localhost:8080/job/SecondBazProject/', '#project_status2', '1.mp3', 2000).init();
 	});
    </script>
    <table>
