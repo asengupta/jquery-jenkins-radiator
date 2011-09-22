@@ -9,11 +9,12 @@
    <script src="jquery.sound.js"></script>
    <script src="jquery.blink.js"></script>
    <script>
-	function Radiator(url, status_id, failure_sound_file, delay)
+	function Radiator(url, status_id, info_id, failure_sound_file, delay)
 	{
 		this.delay = delay;
 		this.url = url;
 		this.status_id = status_id;
+		this.info_id = info_id;
 		this.failure_sound_file = failure_sound_file;
 
 		function color_for(data)
@@ -27,9 +28,16 @@
 		{
 			color = color_for(data)
 			$(this.status_id).css("background-color", color);
+			culprits = "";
+			for (culprit in data.culprits)
+			{
+				culprits = culprits.concat(data.culprits[culprit].fullName + ". ");
+			}
+
 			$(this.status_id).html(data.fullDisplayName);
 			if (color == "red" && color != this.last_status)
 			{
+				$(this.info_id).html(culprits);
 				$(this.status_id).blink(
 				{
 					maxBlinks: 10,
@@ -37,9 +45,17 @@
 					blinkPeriod: 700,
 					onMaxBlinks: function(){}
 				});
-				$.fn.soundPlay({url: this.failure_sound_file, playerId: 'embed_player', command: 'play'});
+//				$.fn.soundPlay({url: this.failure_sound_file, playerId: 'embed_player', command: 'play'});
+			}
+			else if (color == "red" && color == this.last_status)
+			{
+				$(this.info_id).html(culprits);
 			}
 
+			else
+			{
+				$(this.info_id).html('');
+			}
 			this.last_status = color;
 			console.log("Rescheduling " + this.url);
 			setTimeout(function(radiator)
@@ -64,23 +80,30 @@
 		this.init = function()
 		{
 			that = this;
-			$(this.status_id).css({"color": "white", "fontSize": 160, "height": 400, "width": 1800});
+			$(this.status_id).css({"color": "white", "fontSize": 110, "height": 350, "width": 1200});
+			$(this.info_id).css({"color": "white", "fontSize": 45, "height": 120, "width": 1200});
 			that.update();
 		};
 	};
 
 	$(document).ready(function()
 	{
-		new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status1', '1.mp3', 2000).init();
-		new Radiator('http://localhost:8080/job/SecondBazProject/', '#project_status2', '1.mp3', 2000).init();
+		new Radiator('http://server/job/project1/', '#project_status1', "#culprits_1", '1.mp3', 2000).init();
+		new Radiator('http://server/job/project2/', '#project_status2', "#culprits_2", '1.mp3', 2000).init();
 	});
    </script>
    <table>
 	<tr>
-		<td><div id="project_status1" align="center">Loading</div></td>
+		<td>
+			<div id="project_status1" align="center">Loading</div>
+			<div id="culprits_1" align="center">Loading</div>
+		</td>
 	</tr>
 	<tr>
-		<td><div id="project_status2" align="center">Loading</div></td>
+		<td>
+			<div id="project_status2" align="center">Loading</div>
+			<div id="culprits_2" align="center">Loading</div>
+		</td>
 	</tr>
    </table>
    <span id="sound_file_name" style="display:none"> &nbsp;</span>
