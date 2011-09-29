@@ -1,0 +1,14 @@
+Basic Usage
+
+    $(document).ready(function()
+	{
+		new Radiator('http://localhost:8080/job/FooBar%20Project/', '#project_status1', '#culprits_info_1', '1.mp3', 2000).init();
+		new Radiator('http://localhost:8080/job/SecondBazProject/', '#project_status2', '#culprits_info_2', '1.mp3', 2000).init();
+	});
+
+Add as many Radiator objects as you like.
+The signature parameters for a Radiator object are:
+
+    new Radiator([url], [status_text_div_id], [culprit_data_div_id], [failure_sound_file], [refresh_delay]).init();i
+
+Support for rescheduling status update after a network error from a GET request is still not in yet.
