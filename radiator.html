@@ -24,10 +24,24 @@
 			return "red";
 		};
 
+		this.populate_error = function()
+		{
+			$(this.status_id).css("color", "red");
+			$(this.status_id).css("background-color", "black");
+			$(this.status_id).html("Connection lost. Rescheduling...");
+			$(this.info_id).html("");
+			
+			setTimeout(function(radiator)
+			{
+				return function() { radiator.update();};
+			}(this), this.delay);
+		};
+		
 		this.populate = function(data)
 		{
 			color = color_for(data)
 			$(this.status_id).css("background-color", color);
+			$(this.status_id).css("color", "white");
 			culprits = "";
 			for (culprit in data.culprits)
 			{
@@ -57,7 +71,7 @@
 				$(this.info_id).html('');
 			}
 			this.last_status = color;
-			console.log("Rescheduling " + this.url);
+			console.log("Rescheduling...");
 			setTimeout(function(radiator)
 					{
 						return function() { radiator.update();};
@@ -69,9 +83,21 @@
 			$.ajax({
 			  url: this.url + 'lastBuild/api/json?jsonp=?',
 			  data: null,
+			  timeout: 3000,
 			  success: function(radiator)
 					{
-						return function(data) { radiator.populate(data);};
+						return function(data) 
+						{
+							console.log(data);
+							radiator.populate(data);
+						};
+					}(this),
+			  error: function(radiator)
+					{
+						return function(request,status,errorThrown)
+						{
+							radiator.populate_error();
+						};
 					}(this),
 			  dataType: "jsonp"
 			});
@@ -88,8 +114,8 @@
 
 	$(document).ready(function()
 	{
-		new Radiator('http://server/job/project1/', '#project_status1', "#culprits_1", '1.mp3', 2000).init();
-		new Radiator('http://server/job/project2/', '#project_status2', "#culprits_2", '1.mp3', 2000).init();
+		new Radiator('http://server/job/job_name1/', '#project_status1', "#culprits_1", '1.mp3', 2000).init();
+		new Radiator('http://server/job/job_name2/', '#project_status2', "#culprits_2", '1.mp3', 2000).init();
 	});
    </script>
    <table>
