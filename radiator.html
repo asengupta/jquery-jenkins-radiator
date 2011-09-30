@@ -72,7 +72,6 @@
 				$(this.info_id).html('');
 			}
 			this.last_status = color;
-			console.log("Rescheduling...");
 			setTimeout(function(radiator)
 					{
 						return function() { radiator.update();};
@@ -89,7 +88,6 @@
 					{
 						return function(data) 
 						{
-							console.log(data);
 							radiator.populate(data);
 						};
 					}(this),
