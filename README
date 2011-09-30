@@ -11,4 +11,4 @@ The signature parameters for a Radiator object are:
 
     new Radiator([url], [status_text_div_id], [culprit_data_div_id], [failure_sound_file], [refresh_delay]).init();i
 
-Support for rescheduling status update after a network error from a GET request is still not in yet.
+Support for rescheduling status update after a network error from a GET request is now available.
