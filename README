@@ -1,4 +1,4 @@
-Basic Usage
+## Basic Usage
 
     $(document).ready(function()
 	{
@@ -9,6 +9,5 @@ Basic Usage
 Add as many Radiator objects as you like.
 The signature parameters for a Radiator object are:
 
-    new Radiator([url], [status_text_div_id], [culprit_data_div_id], [failure_sound_file], [refresh_delay], [server_response_timeout]).init();i
+    new Radiator([url], [status_text_div_id], [culprit_data_div_id], [failure_sound_file], [refresh_delay], [server_response_timeout]).init();
 
-Support for rescheduling status update after a network error from a GET request is now available.
