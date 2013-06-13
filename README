@@ -1,3 +1,5 @@
+A jQuery-based build radiator for Jenkins, with support for multiple radiators, independent refresh and timeout.
+
 ## Basic Usage
 
     $(document).ready(function()
